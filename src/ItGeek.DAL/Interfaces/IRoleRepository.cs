@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ItGeek.DAL.Entities;
 
-namespace ItGeek.DAL.Interfaces
+namespace ItGeek.DAL.Interfaces;
+
+public interface IRoleRepository : IGenericRepositoryAsync<Role>
 {
-    internal interface IRoleRepository
-    {
-    }
 }
