@@ -12,5 +12,5 @@ public class Category : BaseEntity
     public string Discription { get; set; }
     public string Slug { get; set; }
     public string CategoryImage { get; set; }
-    public List<PostCategory> PostCategorys { get; } = new();
+    public List<Post> Posts { get; } = new();
 }

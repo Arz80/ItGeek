@@ -14,5 +14,5 @@ public class Author : BaseEntity
     public string Discription { get; set; }
     public string AuthorImage { get; set; }
     public string Email { get; set; }
-    public List<PostAuthor> PostAuthors { get; } = new();
+    public List<Post> Posts { get; } = new();
 }
