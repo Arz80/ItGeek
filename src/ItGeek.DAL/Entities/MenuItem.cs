@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ItGeek.DAL.Entities;
 
-public class MenuItem
+public class MenuItem : BaseEntity
 {
     public int MenuId { get; set; }
     public Menu Menu { get; set; }
