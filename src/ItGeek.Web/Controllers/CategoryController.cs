@@ -6,7 +6,6 @@ namespace ItGeek.Web.Controllers
 	{
 		public IActionResult Index()
 		{
-			
 			return View();
 		}
 	}

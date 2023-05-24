@@ -15,9 +15,12 @@
     <link href="~/lib/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
           rel="stylesheet">
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/default.min.css" />
+    
+    <link href="~/lib/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css">
+    
     <!-- Custom styles for this template-->
-    <link href="~/css/admin/sb-admin-2.min.css" rel="stylesheet">
+    <link href="~/css/admin/sb-admin-2.min.css" rel="stylesheet" type="text/css">
 
 </head>
 
@@ -55,11 +58,74 @@
             <div class="sidebar-heading">
                 Контент
             </div>
+            <li class="nav-item">
+                <a class="nav-link" asp-controller="Authors" asp-action="Index">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Авторы</span>
+                </a>
+            </li>
 
             <li class="nav-item">
-                <a class="nav-link" asp-controller="Dashboard" asp-action="Index">
+                <a class="nav-link" asp-controller="AuthorsSocials" asp-action="Index">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>Главная</span>
+                    <span>Соцети авторов</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" asp-controller="Categories" asp-action="Index">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Категории</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" asp-controller="Comments" asp-action="Index">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Комментарии</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" asp-controller="MenuItems" asp-action="Index">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Пункты Меню</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" asp-controller="Menus" asp-action="Index">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Меню</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" asp-controller="Posts" asp-action="Index">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Посты</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" asp-controller="Roles" asp-action="Index">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Роли</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" asp-controller="Tags" asp-action="Index">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Теги</span>
+                </a>
+            </li>
+
+
+            <li class="nav-item">
+                <a class="nav-link" asp-controller="Users" asp-action="Index">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Пользователи</span>
                 </a>
             </li>
 
@@ -103,14 +169,14 @@
                     <!-- Topbar Navbar -->
                     <ul class="navbar-nav ml-auto">
 
-                        
+
                         <div class="topbar-divider d-none d-sm-block"></div>
 
                         <!-- Nav Item - User Information -->
                         <li class="nav-item dropdown no-arrow">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">Сулейманов Арзуман</span>
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">Radik</span>
                                 <img class="img-profile rounded-circle"
                                      src="~/img/undraw_profile.svg">
                             </a>
@@ -146,7 +212,7 @@
 
                     @RenderBody()
 
-                    
+                   
 
                 </div>
                 <!-- /.container-fluid -->
@@ -199,11 +265,16 @@
     <script src="~/lib/jquery-easing/jquery.easing.min.js"></script>
     <script src="~/lib/chart.js/Chart.bundle.min.js"></script>
 
+    <script src="~/lib/datatables/jquery.dataTables.min.js"></script>
+    <script src="~/lib/datatables/dataTables.bootstrap4.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sceditor@3/minified/sceditor.min.js"></script>
 
     <!-- Custom scripts for all pages-->
-    <script src="~/js/admin/sb-admin-2.min.js"></script>
+    <script src="~/js/admin/sb-admin-2.js"></script>
     <script src="~/js/admin/chart-area-demo.js"></script>
 
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 
 </html>
