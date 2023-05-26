@@ -33,6 +33,11 @@ namespace ItGeek.Web.Areas.Admin.ViewModels
         [NotMapped]
         [Display(Name = "Картинка")]
         public IFormFile? ImageFile { get; set; }
+        
+        [Display(Name = "Категория")]
+        public int[] CategoryId { get; set; }
 
+        [Display(Name = "Автор")]
+        public int[] AuthorId { get; set; }
     }
 }

@@ -8,7 +8,7 @@ namespace ItGeek.Web.Controllers
 	public class CategoryController : Controller
 	{
 		private readonly UnitOfWork _uow;
-		public CategoryController(UnitOfWork uow) 
+		public CategoryController(UnitOfWork uow)
 		{
 			_uow = uow;
 		}
@@ -16,7 +16,7 @@ namespace ItGeek.Web.Controllers
 		{
 			return View();
 		}
-
+		//[HttpGet("{categorySlaug}/{postSlug}")]
 		public async Task<IActionResult> Post(string categorySlug, string postSlug)
 		{
 			Post postOne = await _uow.PostRepository.GetBySlugAsync(postSlug);
