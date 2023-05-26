@@ -17,10 +17,12 @@ namespace ItGeek.Web.Areas.Admin.Controllers;
 public class PostsController : Controller
 {
     private readonly UnitOfWork _uow;
+    private readonly IWebHostEnvironment _hostEnvironment;
 
-    public PostsController(UnitOfWork uow)
+    public PostsController(UnitOfWork uow, IWebHostEnvironment hostEnvironment)
     {
         _uow = uow;
+        _hostEnvironment = hostEnvironment;
     }
 
     public async Task<IActionResult> Index()
@@ -93,6 +95,8 @@ public class PostsController : Controller
     {
         if (ModelState.IsValid)
         {
+            postViewModel.PostImage = await ProcessUploadFile(postViewModel);
+
             Post post = new Post()
             {
                 Id = postViewModel.Id,
@@ -180,18 +184,18 @@ public class PostsController : Controller
     protected async Task<string> ProcessUploadFile(PostViewModel postViewModel)
     {
         string uniqueFileName = "";
-        //if (postViewModel.ImageFile != null)
-        //{
-        //    string wwwRootPath = _hostEnvironment.WebRootPath;
-        //    string fileName = Path.GetFileNameWithoutExtension(postViewModel.ImageFile.FileName);
-        //    string fileExtension = Path.GetExtension(postViewModel.ImageFile.FileName);
-        //    uniqueFileName = fileName + DateTime.Now.ToString("yymmddssfff") + fileExtension;
-        //    string path = Path.Combine(wwwRootPath + "/uploads/", uniqueFileName);
-        //    using (var fileStream = new FileStream(path, FileMode.Create))
-        //    {
-        //        await postViewModel.ImageFile.CopyToAsync(fileStream);
-        //    }
-        //}
+        if (postViewModel.ImageFile != null)
+        {
+            string wwwRootPath = _hostEnvironment.WebRootPath;
+            string fileName = Path.GetFileNameWithoutExtension(postViewModel.ImageFile.FileName);
+            string fileExtension = Path.GetExtension(postViewModel.ImageFile.FileName);
+            uniqueFileName = fileName + DateTime.Now.ToString("yymmddssfff") + fileExtension;
+            string path = Path.Combine(wwwRootPath + "/uploads/", uniqueFileName);
+            using (var fileStream = new FileStream(path, FileMode.Create))
+            {
+                await postViewModel.ImageFile.CopyToAsync(fileStream);
+            }
+        }
         return uniqueFileName;
     }
 }

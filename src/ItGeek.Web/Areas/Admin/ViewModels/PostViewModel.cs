@@ -23,9 +23,10 @@ namespace ItGeek.Web.Areas.Admin.ViewModels
         [Required]
         [Display(Name = "Текст новости")]
         public string PostBody { get; set; }
-        [Required]
-        [Display(Name = "Картинка новости")]
-        public string PostImage { get; set; }
+        
+        [Display(Name = "Изображение")]
+        public string? PostImage { get; set; }
+
         [Display(Name = "Открыть комментарии")]
         public bool CommentsClosed { get; set; } = true;
 

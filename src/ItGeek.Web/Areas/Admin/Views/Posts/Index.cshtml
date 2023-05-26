@@ -24,6 +24,9 @@
                     <thead>
                         <tr>
                             <th>
+                                @Html.DisplayNameFor(model => model.PostImage)
+                            </th>
+                            <th>
                                 @Html.DisplayNameFor(model => model.Title)
                             </th>
                             <th>
@@ -39,6 +42,9 @@
                         @foreach (var item in Model)
                         {
                             <tr>
+                                <td>
+                                    <img src="~/uploads/@item.PostImage" style="width: 100px;"></img>
+                                </td>
                                 <td>
                                     @Html.DisplayFor(modelItem => item.Title)
                                 </td>
