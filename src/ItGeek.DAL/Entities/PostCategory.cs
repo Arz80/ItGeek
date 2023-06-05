@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace ItGeek.DAL.Entities;
 
-public class PostCategory
+
+public class PostCategory : BaseEntity
 {
-    public int PostId { get; set; }
-    public int CategoryId { get; set; }
-    public Post Post { get; set; }
-    public Category Category { get; set; }
+	public int PostId { get; set; }
+	public int CategoryId { get; set; }
+	public Post Post { get; set; } = null!;
+	public Category Category { get; set; } = null!;
 }

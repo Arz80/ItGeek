@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ItGeek.DAL.Entities;
+﻿namespace ItGeek.DAL.Entities;
 
 public class Comment : BaseEntity
 {
@@ -13,5 +7,5 @@ public class Comment : BaseEntity
     public string Url { get; set; }
     public string Message { get; set; }
     public DateTime CreatedAt { get; set; }
-    public List<PostComment> PostComments { get; } = new();
+	public List<Post> Posts { get; } = new();
 }
