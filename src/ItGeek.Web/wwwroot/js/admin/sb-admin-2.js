@@ -53,11 +53,7 @@
     e.preventDefault();
   });
 
-    // Replace the textarea #example with SCEditor
-    var textarea = document.getElementById('myeditor');
-    sceditor.create(textarea, {
-        format: 'bbcode',
-    });
+    
 
 })(jQuery); // End of use strict
 
