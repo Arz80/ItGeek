@@ -2,8 +2,8 @@
 
 namespace ItGeek.DAL.Entities;
 
-[Keyless]
-public class PostComment
+
+public class PostComment : BaseEntity
 {
 	public int PostId { get; set; }
 	public int CommentId { get; set; }
