@@ -7,16 +7,17 @@ namespace ItGeek.BLL.Repositories;
 
 public class PostContentRepository : GenericRepositoryAsync<PostContent>, IPostContentRepository
 {
-	private readonly AppDbContext _db;
-	public PostContentRepository(AppDbContext db) : base(db)
-	{
-		_db = db;
-	}
+    private readonly AppDbContext _db;
 
-	public async Task<PostContent> GetByPostIDAsync(int postId)
+    public PostContentRepository(AppDbContext db) : base(db)
 	{
-		return await _db.PostContents.Where(x => x.PostId == postId).FirstAsync();
-	}
+        _db = db;
+    }
+
+    public async Task<PostContent> GetByPostIDAsync(int postId)
+	{
+        return await _db.PostContents.Where(x=>x.PostId == postId).FirstAsync();
+    }
 
 	public async Task<List<PostContent>> ListByCategoryIdAsync(int categoryId)
 	{

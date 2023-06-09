@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ItGeek.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230517132208_Init")]
-    partial class Init
+    [Migration("20230609131907_ReproektGitHub")]
+    partial class ReproektGitHub
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,51 +24,6 @@ namespace ItGeek.DAL.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("AuthorPost", b =>
-                {
-                    b.Property<int>("AuthorsId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PostsId")
-                        .HasColumnType("int");
-
-                    b.HasKey("AuthorsId", "PostsId");
-
-                    b.HasIndex("PostsId");
-
-                    b.ToTable("AuthorPost");
-                });
-
-            modelBuilder.Entity("CategoryPost", b =>
-                {
-                    b.Property<int>("CategoriesId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PostsId")
-                        .HasColumnType("int");
-
-                    b.HasKey("CategoriesId", "PostsId");
-
-                    b.HasIndex("PostsId");
-
-                    b.ToTable("CategoryPost");
-                });
-
-            modelBuilder.Entity("CommentPost", b =>
-                {
-                    b.Property<int>("CommentsId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PostsId")
-                        .HasColumnType("int");
-
-                    b.HasKey("CommentsId", "PostsId");
-
-                    b.HasIndex("PostsId");
-
-                    b.ToTable("CommentPost");
-                });
 
             modelBuilder.Entity("ItGeek.DAL.Entities.Author", b =>
                 {
@@ -82,7 +37,7 @@ namespace ItGeek.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Discription")
+                    b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -122,9 +77,6 @@ namespace ItGeek.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("SocialName")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("AuthorId");
@@ -144,7 +96,7 @@ namespace ItGeek.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Discription")
+                    b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -275,6 +227,7 @@ namespace ItGeek.DAL.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Slug")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -288,11 +241,19 @@ namespace ItGeek.DAL.Migrations
 
             modelBuilder.Entity("ItGeek.DAL.Entities.PostAuthor", b =>
                 {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<int>("AuthorId")
                         .HasColumnType("int");
 
                     b.Property<int>("PostId")
                         .HasColumnType("int");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("AuthorId");
 
@@ -303,11 +264,19 @@ namespace ItGeek.DAL.Migrations
 
             modelBuilder.Entity("ItGeek.DAL.Entities.PostCategory", b =>
                 {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
                     b.Property<int>("PostId")
                         .HasColumnType("int");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
 
@@ -318,11 +287,19 @@ namespace ItGeek.DAL.Migrations
 
             modelBuilder.Entity("ItGeek.DAL.Entities.PostComment", b =>
                 {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<int>("CommentId")
                         .HasColumnType("int");
 
                     b.Property<int>("PostId")
                         .HasColumnType("int");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("CommentId");
 
@@ -339,10 +316,10 @@ namespace ItGeek.DAL.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<bool>("CommentClosed")
+                    b.Property<bool>("CommentsClosed")
                         .HasColumnType("bit");
 
-                    b.Property<int>("CommentNum")
+                    b.Property<int>("CommentsNum")
                         .HasColumnType("int");
 
                     b.Property<string>("PostBody")
@@ -362,18 +339,27 @@ namespace ItGeek.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PostId");
+                    b.HasIndex("PostId")
+                        .IsUnique();
 
                     b.ToTable("PostContents");
                 });
 
             modelBuilder.Entity("ItGeek.DAL.Entities.PostTag", b =>
                 {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<int>("PostId")
                         .HasColumnType("int");
 
                     b.Property<int>("TagId")
                         .HasColumnType("int");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("PostId");
 
@@ -396,6 +382,28 @@ namespace ItGeek.DAL.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Roles");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            RoleName = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            RoleName = 2
+                        },
+                        new
+                        {
+                            Id = 3,
+                            RoleName = 3
+                        },
+                        new
+                        {
+                            Id = 4,
+                            RoleName = 4
+                        });
                 });
 
             modelBuilder.Entity("ItGeek.DAL.Entities.Tag", b =>
@@ -406,7 +414,7 @@ namespace ItGeek.DAL.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Discription")
+                    b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -480,66 +488,6 @@ namespace ItGeek.DAL.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("UserProfiles");
-                });
-
-            modelBuilder.Entity("PostTag", b =>
-                {
-                    b.Property<int>("PostsId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TagsId")
-                        .HasColumnType("int");
-
-                    b.HasKey("PostsId", "TagsId");
-
-                    b.HasIndex("TagsId");
-
-                    b.ToTable("PostTag");
-                });
-
-            modelBuilder.Entity("AuthorPost", b =>
-                {
-                    b.HasOne("ItGeek.DAL.Entities.Author", null)
-                        .WithMany()
-                        .HasForeignKey("AuthorsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ItGeek.DAL.Entities.Post", null)
-                        .WithMany()
-                        .HasForeignKey("PostsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("CategoryPost", b =>
-                {
-                    b.HasOne("ItGeek.DAL.Entities.Category", null)
-                        .WithMany()
-                        .HasForeignKey("CategoriesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ItGeek.DAL.Entities.Post", null)
-                        .WithMany()
-                        .HasForeignKey("PostsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("CommentPost", b =>
-                {
-                    b.HasOne("ItGeek.DAL.Entities.Comment", null)
-                        .WithMany()
-                        .HasForeignKey("CommentsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ItGeek.DAL.Entities.Post", null)
-                        .WithMany()
-                        .HasForeignKey("PostsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("ItGeek.DAL.Entities.AuthorsSocial", b =>
@@ -639,8 +587,8 @@ namespace ItGeek.DAL.Migrations
             modelBuilder.Entity("ItGeek.DAL.Entities.PostContent", b =>
                 {
                     b.HasOne("ItGeek.DAL.Entities.Post", "Post")
-                        .WithMany()
-                        .HasForeignKey("PostId")
+                        .WithOne("PostContents")
+                        .HasForeignKey("ItGeek.DAL.Entities.PostContent", "PostId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -669,7 +617,7 @@ namespace ItGeek.DAL.Migrations
             modelBuilder.Entity("ItGeek.DAL.Entities.User", b =>
                 {
                     b.HasOne("ItGeek.DAL.Entities.Role", "Role")
-                        .WithMany()
+                        .WithMany("Users")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -688,19 +636,14 @@ namespace ItGeek.DAL.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("PostTag", b =>
+            modelBuilder.Entity("ItGeek.DAL.Entities.Post", b =>
                 {
-                    b.HasOne("ItGeek.DAL.Entities.Post", null)
-                        .WithMany()
-                        .HasForeignKey("PostsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("PostContents");
+                });
 
-                    b.HasOne("ItGeek.DAL.Entities.Tag", null)
-                        .WithMany()
-                        .HasForeignKey("TagsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+            modelBuilder.Entity("ItGeek.DAL.Entities.Role", b =>
+                {
+                    b.Navigation("Users");
                 });
 #pragma warning restore 612, 618
         }

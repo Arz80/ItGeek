@@ -7,34 +7,25 @@ namespace ItGeek.Web.Controllers
 {
 	public class CategoryController : Controller
 	{
-		private readonly UnitOfWork _uow;
-		public CategoryController(UnitOfWork uow)
+        private readonly UnitOfWork _uow;
+
+        public CategoryController(UnitOfWork uow)
+        {
+            _uow = uow;
+        }
+        [HttpGet("[Controller]/{categorySlug}")]
+        public async Task<IActionResult> Index(string categorySlug)
 		{
-			_uow = uow;
-		}
-		public IActionResult Index()
-		{
-			return View();
-		}
-		//[HttpGet("{categorySlaug}/{postSlug}")]
-		public async Task<IActionResult> Post(string categorySlug, string postSlug)
-		{
-			Post postOne = await _uow.PostRepository.GetBySlugAsync(postSlug);
 			Category category = await _uow.CategoryRepository.GetBySlugAsync(categorySlug);
-			List<Post> allPosts = await _uow.PostRepository.ListByCategoryIdAsync(category.Id);
-
-			List<PostContent> allPostContents = await _uow.PostContentRepository.ListByCategoryIdAsync(category.Id);
-
-			PostContentViewModel postContent = new PostContentViewModel()
-			{
-				category = category,
-				post = postOne,
-				postContent = await _uow.PostContentRepository.GetByPostIDAsync(postOne.Id),
-				posts = allPosts,
-				postContents = allPostContents
-			};
-
-			return View(postContent);
+			return View(category);
 		}
-	}
+
+		[HttpGet("[Controller]/{categorySlug}/{postSlug}")]
+		public async Task<IActionResult> Post(string categorySlug, string postSlug)
+        {
+			Post postOne = await _uow.PostRepository.GetBySlugAsync(postSlug);
+            ViewBag.Category = await _uow.CategoryRepository.GetBySlugAsync(categorySlug);
+			return View(postOne);
+        }
+    }
 }
