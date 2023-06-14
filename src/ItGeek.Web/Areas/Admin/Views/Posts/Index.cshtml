@@ -43,7 +43,7 @@
                         {
                             <tr>
                                 <td>
-                                    <img src="~/uploads/@item.PostImage" style="width: 100px;"></img>
+                                    <img src="~/uploads/@item.PostImage" style="width:100px;" />
                                 </td>
                                 <td>
                                     @Html.DisplayFor(modelItem => item.Title)
@@ -82,7 +82,6 @@
     <link href="~/lib/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css">
     <script src="~/lib/datatables/jquery.dataTables.min.js"></script>
     <script src="~/lib/datatables/dataTables.bootstrap4.min.js"></script>
-
     <script>
         $(document).ready(function(){
             $('#myTable').DataTable({
