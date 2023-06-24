@@ -2,11 +2,6 @@
 using ItGeek.DAL.Entities;
 using ItGeek.DAL.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ItGeek.BLL.Repositories;
 
@@ -21,6 +16,6 @@ public class CategoryRepository : GenericRepositoryAsync<Category>, ICategoryRep
 
     public async Task<Category> GetBySlugAsync(string slug)
     {
-        return await _db.Categories.Where(x => x.Slug == slug).FirstAsync();
+        return await _db.Categories.Include(x => x.Posts).ThenInclude(i => i.PostContents).Where(x => x.Slug == slug).FirstAsync();
     }
 }

@@ -22,6 +22,7 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/default.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/sceditor@3/minified/sceditor.min.js"></script>
 
@@ -34,19 +35,19 @@
     <link rel="stylesheet" href="~/css/admin/bootstrap-tokenfield.min.css" />
     <script type="text/javascript" src="~/js/admin/bootstrap-tokenfield.min.js"></script>
 
-    <script>
+    <script type="text/javascript">
 
         $(document).ready(function () {
 
             $("#TagIds").tokenfield({
-                autocomplete: {
-                    source: function (request, response) {
+                autocomplete : {
+                    source: function(request, response){
 
                         $.ajax({
                             url: '@Url.Action("GetTagByName", "Posts", "Admin")',
                             data: { "tag": request.term },
                             dataType: "json",
-                            success: function (data) {
+                            success: function(data){
                                 //data = Json.parse(data);
                                 response(data);
                             },
@@ -67,6 +68,6 @@
                 format: 'bbcode',
             });
         });
-
+        
     </script>
 }

@@ -2,11 +2,6 @@
 using ItGeek.DAL.Entities;
 using ItGeek.DAL.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ItGeek.BLL.Repositories;
 
@@ -22,22 +17,29 @@ public class PostRepository : GenericRepositoryAsync<Post>, IPostRepository
 
     public async Task<Post> GetBySlugAsync(string slug)
     {
-        return await _db.Posts.Where(x => x.Slug == slug).FirstAsync();
+        return await _db.Posts.Where(x => x.Slug == slug).Include(x=>x.PostContents).FirstAsync();
     }
 
+
     public async Task<List<Post>> ListByCategoryIdAsync(int categoryId)
-    {
-        Category cat = await _db.Categories.FindAsync(categoryId);
+	{
 
-        List<PostCategory> postCategory = await _db.PostCategories.Where(x=>categoryId == cat.Id).ToListAsync();
+        List<PostCategory> postCategory = await _db.PostCategories
+            .Where(x=>x.CategoryId == categoryId)
+            .ToListAsync();
 
-        List<Post> post = new List<Post>();
+		List<Post> post = new List<Post>();
 
         foreach (var pc in postCategory)
-        { 
+        {
             post.Add(pc.Post);
-        }
+		}
 
-        return post;
+		return post;
+	}
+    public async Task<List<Post>> GetLastAsync(int numberPosts)
+    {
+        //return await _db.Posts.OrderByDescending(x => x.Id).Take(numberPosts).DistinctBy(x => x.Categories.FirstOrDefault().Id).ToListAsync();
+        return await _db.Posts.OrderByDescending(x => x.Id).Take(numberPosts).ToListAsync();
     }
 }

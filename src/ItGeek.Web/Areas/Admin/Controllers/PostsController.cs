@@ -7,253 +7,130 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ItGeek.DAL.Entities;
 using ItGeek.BLL;
-
 using ItGeek.Web.Areas.Admin.ViewModels;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http.HttpResults;
+using static System.Net.Mime.MediaTypeNames;
 
-namespace ItGeek.Web.Areas.Admin.Controllers;
-
-[Area("Admin")]
-public class PostsController : Controller
+namespace ItGeek.Web.Areas.Admin.Controllers
 {
-    private readonly UnitOfWork _uow;
-    private readonly IWebHostEnvironment _hostEnvironment;
-
-    public PostsController(UnitOfWork uow, IWebHostEnvironment hostEnvironment)
+    [Area("Admin")]
+    public class PostsController : Controller
     {
-        _uow = uow;
-        _hostEnvironment = hostEnvironment;
-    }
+        private readonly UnitOfWork _uow;
+        private readonly IWebHostEnvironment _hostEnvironment;
 
-    public async Task<IActionResult> Index()
-    {
-        List<Post> allPosts = (List<Post>)await _uow.PostRepository.ListAllAsync();
-        List<PostContent> allPostsContent = (List<PostContent>)await _uow.PostContentRepository.ListAllAsync();
-        
-        
-        List<PostViewModel> post = new List<PostViewModel>();
-        foreach (var onePost in allPosts)
+        public PostsController(UnitOfWork uow, IWebHostEnvironment hostEnvironment)
         {
-            PostContent onePostsContent = allPostsContent.First(x=>x.PostId == onePost.Id);
-            post.Add(new PostViewModel()
-                {
-                    Id = onePost.Id,
-                    Slug = onePost.Slug,
-                    IsDeleted = onePost.IsDeleted,
-                    Title = onePostsContent.Title,
-                    PostBody = onePostsContent.PostBody,
-                    PostImage = onePostsContent.PostImage,
-                    CommentsClosed = onePostsContent.CommentsClosed,
-                }
-            );
+            _uow = uow;
+            _hostEnvironment = hostEnvironment;
         }
-        
-        return View(post);
-    }
 
-    public async Task<IActionResult> Details(int id)
-    {
-        Post post = await _uow.PostRepository.GetByIDAsync(id);
-        PostContent postContent = await _uow.PostContentRepository.GetByPostIDAsync(id);
-
-        PostViewModel postViewModel = new PostViewModel()
+        public async Task<IActionResult> Index()
         {
-            Id = id,
-            Slug = post.Slug,
-            IsDeleted = post.IsDeleted,
-            Title = postContent.Title,
-            PostBody = postContent.PostBody,
-            PostImage = postContent.PostImage,
-            CommentsClosed = postContent.CommentsClosed
-        };
-
-        return View(postViewModel);
-    }
-
-    public async Task<IActionResult> Delete(int id)
-    {
-        PostContent postContent = await _uow.PostContentRepository.GetByPostIDAsync(id);
-        if (postContent != null)
-        {
-            await _uow.PostContentRepository.DeleteAsync(postContent);
-        }
-        Post post = await _uow.PostRepository.GetByIDAsync(id);
-        if (post != null)
-        {
-            await _uow.PostRepository.DeleteAsync(post);
-        }
-        return RedirectToAction(nameof(Index));
-    }
-
-    [HttpGet]
-    public async Task<IActionResult> Create()
-    {
-        ViewBag.Authors = await _uow.AuthorRepository.ListAllAsync();
-        ViewBag.Categories = await _uow.CategoryRepository.ListAllAsync();
-        ViewBag.PostCategories = new int[0];
-        ViewBag.PostAuthors = new int[0];
-        ViewBag.CategoryCount = null;
-        ViewBag.AuthorCount = null;
-        return View();
-    }
-    [HttpPost]
-    public async Task<IActionResult> Create(PostViewModel postViewModel)
-    {
-        if (ModelState.IsValid)
-        {
-            postViewModel.PostImage = await ProcessUploadFile(postViewModel);
-
-            Post post = new Post()
+            List<Post> allPosts = (List<Post>)await _uow.PostRepository.ListAllAsync();
+            List<PostContent> allPostsContent = (List<PostContent>)await _uow.PostContentRepository.ListAllAsync();
+            
+            
+            List<PostViewModel> post = new List<PostViewModel>();
+            foreach (var onePost in allPosts)
             {
-                Id = postViewModel.Id,
-                Slug = postViewModel.Slug,
-                IsDeleted = postViewModel.IsDeleted,
-                CreatedAt = DateTime.Now,
-                EditedAt = DateTime.Now,
-            };
-            PostContent postContent = new PostContent()
-            {
-                PostId = postViewModel.Id,
-                Post = post,
-                Title = postViewModel.Title,
-                PostBody = postViewModel.PostBody,
-                PostImage = postViewModel.PostImage,
-                CommentsNum = 0,
-                CommentsClosed = postViewModel.CommentsClosed
-            };
-
-            await _uow.PostRepository.InsertAsync(post);
-            await _uow.PostContentRepository.InsertAsync(postContent);
-
-            string[] tagsNames = postViewModel.TagIds.Split(new char[] { ',' });
-
-            foreach (string tagName in tagsNames)
-            {
-                int tagId = await _uow.PostTagRepository.GetTagIdByName(tagName);
-                if (tagId != 0)
-                {
-                    PostTag postTag = new PostTag()
+                PostContent onePostsContent = allPostsContent.First(x=>x.PostId == onePost.Id);
+                post.Add(new PostViewModel()
                     {
-                        PostId = post.Id,
-                        TagId = tagId
-                    };
-                    await _uow.PostTagRepository.InsertAsync(postTag);
-                }
+                        Id = onePost.Id,
+                        Slug = onePost.Slug,
+                        IsDeleted = onePost.IsDeleted,
+                        Title = onePostsContent.Title,
+                        PostBody = onePostsContent.PostBody,
+                        PostImage = onePostsContent.PostImage,
+                        CommentsClosed = onePostsContent.CommentsClosed,
+                    }
+                );
             }
-
-            foreach (int catId in postViewModel.CategoryId)
-            {
-                PostCategory postCategory = new PostCategory()
-                {
-                    PostId = post.Id,
-                    CategoryId = catId
-                };
-                await _uow.PostCategoryRepository.InsertAsync(postCategory);
-            }
-
-
-            foreach (int authId in postViewModel.AuthorId)
-            {
-                PostAuthor postAuthor = new PostAuthor()
-                {
-                    PostId = post.Id,
-                    AuthorId = authId
-                };
-                await _uow.PostAuthorRepository.InsertAsync(postAuthor);
-            }
-             return RedirectToAction(nameof(Index));
+            
+            return View(post);
         }
 
-        ViewBag.Authors = await _uow.AuthorRepository.ListAllAsync();
-        ViewBag.Categories = await _uow.CategoryRepository.ListAllAsync();
-        ViewBag.PostCategories = await _uow.PostCategoryRepository.ListByPostIdAsync(postViewModel.Id);
-        ViewBag.PostAuthors = await _uow.PostAuthorRepository.ListByPostIdAsync(postViewModel.Id);
-        ViewBag.CategoryCount = ((IEnumerable<int>)ViewBag.PostCategories).ToList().Count;
-        ViewBag.AuthorCount = ((IEnumerable<int>)ViewBag.PostAuthors).ToList().Count;
-
-        return View(postViewModel);
-    }
-    [HttpGet]
-    public async Task<IActionResult> Update(int id)
-    {
-        Post post = await _uow.PostRepository.GetByIDAsync(id);
-        if (post == null)
+        public async Task<IActionResult> Details(int id)
         {
-            return NotFound();
+            Post post = await _uow.PostRepository.GetByIDAsync(id);
+            PostContent postContent = await _uow.PostContentRepository.GetByPostIDAsync(id);
+
+            PostViewModel postViewModel = new PostViewModel()
+            {
+                Id = id,
+                Slug = post.Slug,
+                IsDeleted = post.IsDeleted,
+                Title = postContent.Title,
+                PostBody = postContent.PostBody,
+                PostImage = postContent.PostImage,
+                CommentsClosed = postContent.CommentsClosed
+            };
+
+            return View(postViewModel);
         }
-        PostContent postContent = await _uow.PostContentRepository.GetByPostIDAsync(id);
 
-        string tagNames = await _uow.PostTagRepository.GetByPostIDAsync(id);
-
-        PostViewModel postViewModel = new PostViewModel()
+        public async Task<IActionResult> Delete(int id)
         {
-            Id = id,
-            Slug = post.Slug,
-            IsDeleted = post.IsDeleted,
-            Title = postContent.Title,
-            PostBody = postContent.PostBody,
-            PostImage = postContent.PostImage,
-            CommentsClosed = postContent.CommentsClosed,
-            TagIds = tagNames
-        };
-
-
-        ViewBag.Authors = await _uow.AuthorRepository.ListAllAsync();
-        ViewBag.Categories = await _uow.CategoryRepository.ListAllAsync();
-        ViewBag.PostCategories = await _uow.PostCategoryRepository.ListByPostIdAsync(id);
-        ViewBag.PostAuthors = await _uow.PostAuthorRepository.ListByPostIdAsync(id);
-        ViewBag.CategoryCount = ((IEnumerable<int>)ViewBag.PostCategories).ToList().Count;
-        ViewBag.AuthorCount = ((IEnumerable<int>)ViewBag.PostAuthors).ToList().Count;
-
-        return View(postViewModel);
-    }
-
-    [HttpPost]
-    public async Task<IActionResult> Update(PostViewModel postViewModel)
-    {
-        if (ModelState.IsValid)
-        {
-            Post post = await _uow.PostRepository.GetByIDAsync(postViewModel.Id);
-
-            post.Slug = postViewModel.Slug;
-            post.IsDeleted = postViewModel.IsDeleted;
-            post.EditedAt = DateTime.Now;
-            //TODO: post.EditedBy = User;
-
-            await _uow.PostRepository.UpdateAsync(post);
-
-            // Получим Пост контент
-            PostContent postContent = await _uow.PostContentRepository.GetByPostIDAsync(postViewModel.Id);
-
-            // Заполняем Пост контент из формы
-            postContent.Title = postViewModel.Title;
-            postContent.PostBody = postViewModel.PostBody;
-            postContent.CommentsClosed = postViewModel.CommentsClosed;
-
-            // Получили новую картинку 
-            if (postViewModel.ImageFile != null)
+            PostContent postContent = await _uow.PostContentRepository.GetByPostIDAsync(id);
+            if (postContent != null)
             {
-                string newImage = await ProcessUploadFile(postViewModel);
-                postContent.PostImage = newImage;
-
-                //TODO удалить старую картинку
+                await _uow.PostContentRepository.DeleteAsync(postContent);
             }
-            await _uow.PostContentRepository.UpdateAsync(postContent);
-
-            //qwe, qweret, qwe
-            string[] tagsNames = postViewModel.TagIds.Split(new char[] { ',' });
-            // [qwe, qweret, qwe]
-
-            foreach (string tagName in tagsNames)
+            Post post = await _uow.PostRepository.GetByIDAsync(id);
+            if (post != null)
             {
-                //tagName = qwe
-                int tagId = await _uow.PostTagRepository.GetTagIdByName(tagName);
-                // tagId = 5
-                if (tagId != 0)
+                await _uow.PostRepository.DeleteAsync(post);
+            }
+            return RedirectToAction(nameof(Index));
+        }
+        [HttpGet]
+        public async Task<IActionResult> Create()
+        {
+            ViewBag.Authors = await _uow.AuthorRepository.ListAllAsync();
+            ViewBag.Categories = await _uow.CategoryRepository.ListAllAsync();
+            ViewBag.PostCategories = new int[0];
+            ViewBag.PostAuthors = new int[0];
+            ViewBag.CategoryCount = null;
+            ViewBag.AuthorCount = null;
+            return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> Create(PostViewModel postViewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                postViewModel.PostImage = await ProcessUploadFile(postViewModel);
+
+                Post post = new Post()
                 {
-                    bool havePostTag = await _uow.PostTagRepository.GetByTagIdAsync(post.Id, tagId);
-                    if (!havePostTag)
+                    Id = postViewModel.Id,
+                    Slug = postViewModel.Slug,
+                    IsDeleted = postViewModel.IsDeleted,
+                    CreatedAt = DateTime.Now,
+                    EditedAt = DateTime.Now,
+                };
+                PostContent postContent = new PostContent()
+                {
+                    PostId = postViewModel.Id,
+                    Post = post,
+                    Title = postViewModel.Title,
+                    PostBody = postViewModel.PostBody,
+                    PostImage = postViewModel.PostImage,
+                    CommentsNum = 0,
+                    CommentsClosed = postViewModel.CommentsClosed
+                };
+
+				await _uow.PostRepository.InsertAsync(post);
+				await _uow.PostContentRepository.InsertAsync(postContent);
+
+                string[] tagsNames = postViewModel.TagIds.Split(new char[] { ',' });
+
+                foreach (string tagName in tagsNames)
+                {
+                    int tagId = await _uow.PostTagRepository.GetTagIdByName(tagName.Trim());
+                    if (tagId != 0)
                     {
                         PostTag postTag = new PostTag()
                         {
@@ -263,50 +140,176 @@ public class PostsController : Controller
                         await _uow.PostTagRepository.InsertAsync(postTag);
                     }
                 }
+
+                foreach (int catId in postViewModel.CategoryId)
+                {
+                    PostCategory postCategory = new PostCategory()
+				    {    
+                        PostId = post.Id,
+					    CategoryId = catId
+				    };
+                    await _uow.PostCategoryRepository.InsertAsync(postCategory);
+				}
+				foreach (int authId in postViewModel.AuthorId)
+                {
+					PostAuthor postAuthor = new PostAuthor()
+					{
+						PostId = post.Id,
+						AuthorId = authId
+					};
+					await _uow.PostAuthorRepository.InsertAsync(postAuthor);
+				}
+				return RedirectToAction(nameof(Index));
             }
-
-
-            return RedirectToAction(nameof(Index));
+            ViewBag.Authors = await _uow.AuthorRepository.ListAllAsync();
+            ViewBag.Categories = await _uow.CategoryRepository.ListAllAsync();
+            ViewBag.PostCategories = await _uow.PostCategoryRepository.ListByPostIdAsync(postViewModel.Id);
+            ViewBag.PostAuthors = await _uow.PostAuthorRepository.ListByPostIdAsync(postViewModel.Id);
+            ViewBag.CategoryCount = ((IEnumerable<int>)ViewBag.PostCategories).ToList().Count;
+            ViewBag.AuthorCount = ((IEnumerable<int>)ViewBag.PostAuthors).ToList().Count;
+            return View(postViewModel);
         }
-        ViewBag.Authors = await _uow.AuthorRepository.ListAllAsync();
-        ViewBag.Categories = await _uow.CategoryRepository.ListAllAsync();
-        ViewBag.PostCategories = await _uow.PostCategoryRepository.ListByPostIdAsync(postViewModel.Id);
-        ViewBag.PostAuthors = await _uow.PostAuthorRepository.ListByPostIdAsync(postViewModel.Id);
-        ViewBag.CategoryCount = ((IEnumerable<int>)ViewBag.PostCategories).ToList().Count;
-        ViewBag.AuthorCount = ((IEnumerable<int>)ViewBag.PostAuthors).ToList().Count;
-
-        return View(postViewModel);
-    }
-
-    protected async Task<string> ProcessUploadFile(PostViewModel postViewModel)
-    {
-        string uniqueFileName = "";
-        if (postViewModel.ImageFile != null)
+        [HttpGet]
+        public async Task<IActionResult> Update(int id)
         {
-            string wwwRootPath = _hostEnvironment.WebRootPath;
-            string fileName = Path.GetFileNameWithoutExtension(postViewModel.ImageFile.FileName);
-            string fileExtension = Path.GetExtension(postViewModel.ImageFile.FileName);
-            uniqueFileName = fileName + DateTime.Now.ToString("yymmddssfff") + fileExtension;
-            string path = Path.Combine(wwwRootPath + "/uploads/", uniqueFileName);
-            using (var fileStream = new FileStream(path, FileMode.Create))
+            Post post = await _uow.PostRepository.GetByIDAsync(id);
+            if (post == null)
             {
-                await postViewModel.ImageFile.CopyToAsync(fileStream);
+                return NotFound();
             }
+            PostContent postContent = await _uow.PostContentRepository.GetByPostIDAsync(id);
+            
+            string tagNames = await _uow.PostTagRepository.GetByPostIDAsync(id);
+
+            PostViewModel postViewModel = new PostViewModel()
+            {
+                Id = id,
+                Slug = post.Slug,
+                IsDeleted = post.IsDeleted,
+                Title = postContent.Title,
+                PostBody = postContent.PostBody,
+                PostImage = postContent.PostImage,
+                CommentsClosed = postContent.CommentsClosed,
+                TagIds = tagNames
+            };
+
+
+
+			ViewBag.Authors = await _uow.AuthorRepository.ListAllAsync();
+			ViewBag.Categories = await _uow.CategoryRepository.ListAllAsync();
+			ViewBag.PostCategories = await _uow.PostCategoryRepository.ListByPostIdAsync(id);
+			ViewBag.PostAuthors = await _uow.PostAuthorRepository.ListByPostIdAsync(id);
+            ViewBag.CategoryCount = ((IEnumerable<int>)ViewBag.PostCategories).ToList().Count;
+            ViewBag.AuthorCount = ((IEnumerable<int>)ViewBag.PostAuthors).ToList().Count;
+
+            return View(postViewModel);
         }
-        return uniqueFileName;
-    }
-
-    public async Task<JsonResult> GetTagByName(string tag)
-    {
-
-        List<Tag> result = await _uow.TagRepository.GetTagByNameAsync(tag);
-
-        List<string> res = new List<string>();
-        foreach (Tag item in result)
+        [HttpPost]
+        public async Task<IActionResult> Update(PostViewModel postViewModel)
         {
-            res.Add(item.Name);
+            if (ModelState.IsValid)
+            {
+                Post post = await _uow.PostRepository.GetByIDAsync(postViewModel.Id);
+
+                post.Slug = postViewModel.Slug;
+                post.IsDeleted = postViewModel.IsDeleted;
+                post.EditedAt = DateTime.Now;
+                //TODO: post.EditedBy = User;
+
+                await _uow.PostRepository.UpdateAsync(post);
+
+                // Получим Пост контент
+                PostContent postContent = await _uow.PostContentRepository.GetByPostIDAsync(postViewModel.Id);
+
+                // Заполняем Пост контент из формы
+                postContent.Title = postViewModel.Title;
+                postContent.PostBody = postViewModel.PostBody;
+                postContent.CommentsClosed = postViewModel.CommentsClosed;
+
+                // Получили новую картинку 
+                if (postViewModel.ImageFile != null)
+                {
+                    string newImage = await ProcessUploadFile(postViewModel);
+                    postContent.PostImage = newImage;
+
+                    //TODO удалить старую картинку
+                }
+                await _uow.PostContentRepository.UpdateAsync(postContent);
+
+                //qwe
+                string[] tagsNames = postViewModel.TagIds.Split(new char[] { ',' });
+                // [qwe, qweret, qwe]
+
+                await _uow.PostTagRepository.DeleteByPostIdAsync(post.Id);
+                foreach (string tagName in tagsNames)
+                {
+                    Tag tag = await _uow.TagRepository.GetOneTagByNameAsync(tagName);
+                    if(tag != null)
+                    {
+                        PostTag postTag = new PostTag()
+                        {
+                            PostId = post.Id,
+                            TagId = tag.Id
+                        };
+                        await _uow.PostTagRepository.InsertAsync(postTag);
+                    }
+                }
+
+                await _uow.PostAuthorRepository.DeleteByPostIdAsync(post.Id);
+                foreach (int authId in postViewModel.AuthorId)
+                {
+                    Author haveAuthor = await _uow.AuthorRepository.GetByIDAsync(authId);
+                    if (haveAuthor != null)
+                    {
+                        PostAuthor postAuthor = new PostAuthor()
+                        {
+                            PostId = post.Id,
+                            AuthorId = authId
+                        };
+                        await _uow.PostAuthorRepository.InsertAsync(postAuthor);
+                    }
+                }
+
+                return RedirectToAction(nameof(Index));
+            }
+            ViewBag.Authors = await _uow.AuthorRepository.ListAllAsync();
+            ViewBag.Categories = await _uow.CategoryRepository.ListAllAsync();
+            ViewBag.PostCategories = await _uow.PostCategoryRepository.ListByPostIdAsync(postViewModel.Id);
+            ViewBag.PostAuthors = await _uow.PostAuthorRepository.ListByPostIdAsync(postViewModel.Id);
+            ViewBag.CategoryCount = ((IEnumerable<int>)ViewBag.PostCategories).ToList().Count;
+            ViewBag.AuthorCount = ((IEnumerable<int>)ViewBag.PostAuthors).ToList().Count;
+            return View(postViewModel);
         }
 
-        return Json(res);
+        protected async Task<string> ProcessUploadFile(PostViewModel postViewModel)
+        {
+            string uniqueFileName = "";
+            if (postViewModel.ImageFile != null)
+            {
+                string wwwRootPath = _hostEnvironment.WebRootPath;
+                string fileName = Path.GetFileNameWithoutExtension(postViewModel.ImageFile.FileName);
+                string fileExtension = Path.GetExtension(postViewModel.ImageFile.FileName);
+                uniqueFileName = fileName + DateTime.Now.ToString("yymmddssfff") + fileExtension;
+                string path = Path.Combine(wwwRootPath + "/uploads/", uniqueFileName);
+                using(var fileStream = new FileStream(path, FileMode.Create))
+                {
+                    await postViewModel.ImageFile.CopyToAsync(fileStream);
+                }
+            }
+            return uniqueFileName;
+        }
+        public async Task<JsonResult> GetTagByName(string tag)
+        {
+
+            List<Tag> result = await _uow.TagRepository.GetTagByNameAsync(tag);
+
+            List<string> res = new List<string>();
+            foreach (Tag item in result)
+            {
+                res.Add(item.Name);
+            }
+
+            return Json(res);
+        }
     }
 }
