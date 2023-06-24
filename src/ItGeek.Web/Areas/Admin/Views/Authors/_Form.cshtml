@@ -23,7 +23,16 @@
 </div>
 <div class="form-group">
     <label asp-for="AuthorImage" class="control-label"></label>
-    <input asp-for="AuthorImage" class="form-control" />
+    @if (!ViewBag.isCreate)
+    {
+        @if (Model.AuthorImage != null)
+        {
+            <img src="~/uploads/@Model.AuthorImage" style="width:150px;" />
+        }
+        <input type="hidden" asp-for="AuthorImage" class="form-control" />
+        <input type="hidden" asp-for="Id" />
+    }
+    <input asp-for="ImageFile" type="file" accept="image/*" class="form-control" />
     <span asp-validation-for="AuthorImage" class="text-danger"></span>
 </div>
 <div class="form-group">
@@ -31,7 +40,7 @@
     <input asp-for="Email" class="form-control" />
     <span asp-validation-for="Email" class="text-danger"></span>
 </div>
-<input type="hidden" asp-for="Id" />
+
 <div class="form-group">
     <input type="submit" value="Сохранить" class="btn btn-primary" />
 </div>

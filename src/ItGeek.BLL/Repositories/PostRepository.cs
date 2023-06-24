@@ -40,6 +40,6 @@ public class PostRepository : GenericRepositoryAsync<Post>, IPostRepository
     public async Task<List<Post>> GetLastAsync(int numberPosts)
     {
         //return await _db.Posts.OrderByDescending(x => x.Id).Take(numberPosts).DistinctBy(x => x.Categories.FirstOrDefault().Id).ToListAsync();
-        return await _db.Posts.OrderByDescending(x => x.Id).Take(numberPosts).ToListAsync();
+        return await _db.Posts.Include(x => x.PostContents).Include(q => q.Categories).OrderByDescending(x => x.Id).Take(numberPosts).ToListAsync();
     }
 }
